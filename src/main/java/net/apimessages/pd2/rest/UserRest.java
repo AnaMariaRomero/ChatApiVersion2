@@ -1,9 +1,11 @@
 package net.apimessages.pd2.rest;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -63,7 +65,7 @@ public class UserRest {
 	}
 	
 	@GetMapping(value = "{alias}")
-	public User buscarUsuarioPorAlias (@PathVariable ("alias") String alias) throws Exception{
+	public User searchForAlias (@PathVariable ("alias") String alias) throws Exception{
 		try{
 			System.out.print(userService.findByAlias(alias));
 		}catch(Exception e){
@@ -73,14 +75,24 @@ public class UserRest {
 		return userService.findByAlias(alias);
 	}
 	
+	@PutMapping(path = "/{alias}/status", consumes = MediaType.APPLICATION_JSON_VALUE)
+	 public ResponseEntity<Object> changeStatus(@PathVariable ("alias") String alias, @RequestBody CopyStatus copyStatus) throws Exception{
+	 User userTemporal = userService.findByAlias(alias);  
+	 if ((userTemporal == null)){
+	 	throw new BadRequest("Verifique el alias por favor.");
+	 }else{
+	  	userTemporal.setStatus(copyStatus.getStatus());
+	 	userService.save(userTemporal);
+	 }
+	  
+	 return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+	            Collections.singletonMap("User: " + userTemporal.getAlias(), "Status:" + userTemporal.getStatus()));
+}
 	public static class CopyMessage{
 		String recipient;
 		String content;
 		public String getRecipient() {
 			return recipient;
-		}
-		public void setRecipient(String recipient) {
-			this.recipient = recipient;
 		}
 		public CopyMessage(String recipient, String content) {
 			this.recipient = recipient;
@@ -89,8 +101,15 @@ public class UserRest {
 		public String getContent() {
 			return content;
 		}
-		public void setContent(String content) {
-			this.content = content;
+	}
+	public static class CopyStatus{
+		String status;
+		
+		public CopyStatus(String status) {
+			this.status = status;
+		}
+		public String getStatus() {
+			return status;
 		}
 	}
 }
