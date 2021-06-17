@@ -58,7 +58,7 @@ public class UserRest {
 		 	userTemporal.getMessages().add(messageToSend);
 		 	userService.save(userTemporal);
 		  
-		 	return ResponseEntity.created(new URI("/api/users/alias/chat/send/"+userTemporal.getAlias())).body(userTemporal);
+		 	return ResponseEntity.created(new URI("/api/users/alias/chat/"+userTemporal.getAlias())).body(userTemporal);
 		 }
 	}
 	

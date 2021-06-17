@@ -38,7 +38,6 @@ public class Message {
 		this.content = content;
 	}
 	
-	//Getters & Setters
 	public Long getId() {return id;}
 	
 	public String getSender() {

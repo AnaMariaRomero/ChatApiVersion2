@@ -6,7 +6,7 @@ import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.LangDetectException;
 
 
-public class DectectorLanguage {
+public class DetectorLanguage {
 
 	/**
      * @param args
