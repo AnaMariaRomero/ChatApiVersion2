@@ -30,6 +30,7 @@ import net.apimessages.pd2.service.UserService;
 import org.springframework.http.HttpHeaders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.Matchers.*;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.http.MediaType;
@@ -45,6 +46,9 @@ public class UserMockitoTest {
 
 	@Autowired
     private MockMvc mockMvc;
+	
+	@Autowired
+	private WebApplicationContext wac;
 	
 	@Mock
 	UserService userService;
@@ -102,7 +106,7 @@ public class UserMockitoTest {
 		mockMvc.perform(put("/api/users/alas/status/").contentType(MediaType.APPLICATION_JSON).content(asJsonToString(Collections.singletonMap("Status ", "Activo"))))
 		.andExpect(status().isNotFound());
 	}
-	/*
+	
 	@Test
 	void changeStatusIsAccepted() throws Exception {
 		Long id = 1l;
@@ -110,11 +114,16 @@ public class UserMockitoTest {
 		UUID uuid = UUID.randomUUID();
 		User userReturn = new User("juan","gmail@gmail.com","alias");
 		User userReturned = new User(id,uuid,"juan","gmail@gmail.com","alias","Activo",messages);
-		when(userService.save(userReturn)).thenReturn(userReturned);
+		/*MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.put("/api/users/alias/status/")
+	    		.contentType(MediaType.APPLICATION_JSON_VALUE)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(asJsonToString(Collections.singletonMap("status", "Inactivo")));
 		
-		mockMvc.perform(put("/api/users/{alias}/status/","alias").contentType(MediaType.APPLICATION_JSON).content(asJsonToString(Collections.singletonMap("Status ", "Inactivo"))))
-		.andExpect(status().isAccepted());
-	}*/
+		mockMvc.perform(builder)
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string(asJsonToString(Collections.singletonMap("Status ", "Cambiado"))))
+				.andDo(MockMvcResultHandlers.print());*/
+	}
 	
 	@Test
 	void getAliasUserNotFound() throws Exception{

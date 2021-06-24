@@ -71,12 +71,18 @@ class ConsultingMockitoTest {
 		UUID uuid = UUID.randomUUID();
 		User userReturn = new User("juan","gmail@gmail.com","alias");
 		User userReturned = new User(id,uuid,"juan","gmail@gmail.com","alias","Activo",messages);
-		Map<String, Integer> map = new HashMap<String, Integer>(); 
-		when(userService.create(userReturn)).thenReturn(userReturned);
+		when(userService.create(any())).thenReturn(userReturned);
 		
-		mockMvc.perform(get("/api/admin/users/{alias}/consulting/messages/sent","alias"))
-		.andExpect(status().isOk())
-		.andExpect(jsonPath("$", hasSize(1)));
+		mockMvc.perform(get("/api/admin/users/alias/consulting/messages/sent"))
+		.andExpect(status().isOk());
 	}
+	
+	static String asJsonToString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
