@@ -20,7 +20,6 @@ public class UserService implements UserRepository{
 
 	public List<User> findAll() {
 		List<User> users = userRepository.findAll();
-		System.out.print("Getting: " + users);
 		return users;
 	}
 	

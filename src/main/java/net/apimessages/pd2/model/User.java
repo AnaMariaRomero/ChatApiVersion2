@@ -48,12 +48,14 @@ public class User {
 			@NotBlank(message = "Email it cant be empty.") 
 			@Pattern(regexp = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", 
 			message = "Email invalid.") String email,
-			@NotBlank(message = "Alias it cant be empty.") String alias) {
+			@NotBlank(message = "Alias it cant be empty.") String alias, String status, List<Message> messages) {
 		this.id = id;
 		this.uuid = uuid;
 		this.alias = alias;
 		this.name = name;
 		this.email = email;
+		this.status = status;
+		this.messages = messages;
 	}
 	
 	public User(@NotBlank(message = "Name it cant be empty.") String name,
@@ -64,8 +66,6 @@ public class User {
 		this.alias = alias;
 		this.name = name;
 		this.email = email;
-		this.uuid = UUID.randomUUID();
-		this.status = "Activo";
 	}
 	
 	public Long getId() {

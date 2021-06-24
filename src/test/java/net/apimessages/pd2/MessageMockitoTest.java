@@ -48,47 +48,27 @@ public class MessageMockitoTest {
 	
 	@Test
 	void connectionIsOK() throws Exception {
-				
-		Message m1 = new  Message(1l,"cf08b179-a4c7-4dee-8965-d9c94f9f013a", "cf08b179-a4c7-4dee-8965-d9c94f9f013a","this message H2");
-		Message m2 = new  Message(2l,"cf08b179-a4c7-4dee-8965-d9c94f9f013a", "cf08b179-a4c7-4dee-8965-d9c94f9f013a","this message H2 two");
-	    List list = Arrays.asList(m1,m2);
-		when(messageService.findAll()).thenReturn(list);
+		when(messageService.findAll()).thenReturn(null);
 	
-		mockMvc.perform(get("/api/messages/"))
+		mockMvc.perform(get("/messages/"))
 		.andExpect(status().isOk())
-		.andExpect(jsonPath("$", hasSize(2)));
+		.andExpect(jsonPath("$", hasSize(1)));
 	}
 	
 	@Test
 	void createdIsOK() throws Exception {
-				
-		Message m1Saved = new  Message("cf08b179-a4c7-4dee-8965-d9c94f9f013a", "cf08b179-a4c7-4dee-8965-d9c94f9f013a","this message H2");
 		Message m2Returned = new  Message(1l,"cf08b179-a4c7-4dee-8965-d9c94f9f013a", "cf08b179-a4c7-4dee-8965-d9c94f9f013a","this message H2");
 	    
 		when(messageService.create(any())).thenReturn(m2Returned);
 	
-		mockMvc.perform(post("/api/messages/").contentType(MediaType.APPLICATION_JSON).content(asJsonToString(m2Returned)))
+		mockMvc.perform(post("/api/sending").contentType(MediaType.APPLICATION_JSON).content(asJsonToString(m2Returned)))
 		.andExpect(status().isCreated())
 		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(header().string(HttpHeaders.LOCATION, "/api/messages/1"))
+		.andExpect(header().string(HttpHeaders.LOCATION, "/messages/1"))
 		.andExpect(jsonPath("$.id", is(1)))
 		.andExpect(jsonPath("$.sender", is("cf08b179-a4c7-4dee-8965-d9c94f9f013a")))
 		.andExpect(jsonPath("$.recipient", is("cf08b179-a4c7-4dee-8965-d9c94f9f013a")));
 		
-	}
-	
-	@Test
-	void giveMessageByIdIsOk() throws Exception{
-		Message m1Saved = new  Message(1l,"cf08b179-a4c7-4dee-8965-d9c94f9f013a", "cf08b179-a4c7-4dee-8965-d9c94f9f013a","this message H2");
-		when(messageService.getById(1l)).thenReturn(m1Saved);
-		
-	
-		mockMvc.perform(get("/api/messages/{id}", 1l))
-		.andExpect(status().isOk())
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.id", is(1)))
-		.andExpect(jsonPath("$.sender", is("cf08b179-a4c7-4dee-8965-d9c94f9f013a")))
-		.andExpect(jsonPath("$.recipient", is("cf08b179-a4c7-4dee-8965-d9c94f9f013a")));
 	}
 	
 	@Test
@@ -103,7 +83,7 @@ public class MessageMockitoTest {
 	@Test
 	void createdBadRequest() throws Exception {	    
 		when(messageService.create(null)).thenReturn(null);
-		mockMvc.perform(post("/api/messages/"))
+		mockMvc.perform(post("/api/sending/"))
 		.andExpect(status().isBadRequest());
 	}
 	

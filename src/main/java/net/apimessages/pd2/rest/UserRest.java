@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import net.apimessages.pd2.exceptions.BadRequest;
-import net.apimessages.pd2.exceptions.MessageNotFoundException;
-import net.apimessages.pd2.exceptions.ServerError;
+import net.apimessages.pd2.exceptions.*;
 import net.apimessages.pd2.model.Message;
 import net.apimessages.pd2.model.User;
 import net.apimessages.pd2.service.UserService;
@@ -30,8 +28,8 @@ public class UserRest {
 	private UserService userService;
 	
 	@GetMapping
-	public ResponseEntity<Optional<List<User>>> getAll(){
-		Optional<List<User>> users =  Optional.of(userService.findAll());
+	public ResponseEntity<List<User>> getAll(){
+		List<User> users =  userService.findAll();
 		return ResponseEntity.ok().body(users);
 	}
 	
@@ -43,9 +41,9 @@ public class UserRest {
 			
 		}catch (Exception n) {
 			if (n instanceof NullPointerException ) {
-				throw new ServerError("El alias o email que quiere usar ya se encuentra en uso. ");
+				throw new BadRequest("El alias o email que quiere usar ya se encuentra en uso. ");
 			}else {
-			    throw new BadRequest("Mal pedido por parte del usuario.");}
+			    throw new ServerError("Mal pedido por parte del usuario.");}
 		}
 	}
 	
@@ -60,34 +58,46 @@ public class UserRest {
 		 	userTemporal.getMessages().add(messageToSend);
 		 	userService.save(userTemporal);
 		  
-		 	return ResponseEntity.created(new URI("/api/users/alias/chat/"+userTemporal.getAlias())).body(userTemporal);
+		 	return ResponseEntity.created(new URI("/chat/"+userTemporal.getAlias())).body(userTemporal);
 		 }
 	}
 	
 	@GetMapping(value = "{alias}")
 	public User searchForAlias (@PathVariable ("alias") String alias) throws Exception{
-		try{
-			System.out.print(userService.findByAlias(alias));
-		}catch(Exception e){
-			throw new MessageNotFoundException("No se encontro el usuario con el alias: " + alias);
+		if(userService.findByAlias(alias) == null) {
+			throw new MessageNotFoundException("No se encontro usuario.");
+		}else {
+			return userService.findByAlias(alias);
 		}
 		
-		return userService.findByAlias(alias);
 	}
 	
-	@PutMapping(path = "/{alias}/status", consumes = MediaType.APPLICATION_JSON_VALUE)
-	 public ResponseEntity<Object> changeStatus(@PathVariable ("alias") String alias, @RequestBody CopyStatus copyStatus) throws Exception{
-	 User userTemporal = userService.findByAlias(alias);  
-	 if ((userTemporal == null)){
-	 	throw new BadRequest("Verifique el alias por favor.");
-	 }else{
-	  	userTemporal.setStatus(copyStatus.getStatus());
-	 	userService.save(userTemporal);
-	 }
-	  
-	 return ResponseEntity.status(HttpStatus.ACCEPTED).body(
-	            Collections.singletonMap("User: " + userTemporal.getAlias(), "Status:" + userTemporal.getStatus()));
-}
+	@PutMapping(path = "/{alias}/status/", consumes = MediaType.APPLICATION_JSON_VALUE)
+	 public ResponseEntity<Object> changeStatus(@PathVariable ("alias") String alias, @RequestBody String copy) throws Exception{
+		try{
+			User userTemporal = userService.findByAlias(alias);
+			userTemporal.setStatus(setStatus(copy));
+			userService.save(userTemporal);
+		}catch(Exception e){
+			if (e instanceof NullPointerException ) {
+				throw new MessageNotFoundException("No se encontro el usuario con el alias: " + alias);
+			}else {
+			    throw new BadRequest("El estado es inválido.");}
+		}
+		return ResponseEntity.status(HttpStatus.ACCEPTED).body(
+		           Collections.singletonMap("Status ", "Cambiado"));
+	}
+	
+	private String setStatus(String copy) {
+		if (copy.contains("Activo")) {
+			return "Activo";
+		}else if(copy.contains("Inactivo")){
+			return "Inactivo";
+		}else {
+			throw new BadRequest("El estado es inválido.");
+		}
+	}
+	
 	public static class CopyMessage{
 		String recipient;
 		String content;
@@ -100,16 +110,6 @@ public class UserRest {
 		}
 		public String getContent() {
 			return content;
-		}
-	}
-	public static class CopyStatus{
-		String status;
-		
-		public CopyStatus(String status) {
-			this.status = status;
-		}
-		public String getStatus() {
-			return status;
 		}
 	}
 }
