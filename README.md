@@ -15,7 +15,27 @@
 # Para correr la aplicación
 >mvnw spring-boot:run
 
-# Para probar el uso de la Api
+# Para probar el uso de la Api: cURL
+
+POST
+>curl -d {\"name\":\"juan\",\"email\":\"asj@gmail.com\",\"alias\":\"fatos\"} -H "Content-Type: application/json" http://localhost:8082/api/users/create/ -v
+
+>curl -d {\"name\":\"juan\",\"email\":\"aj@gmail.com\",\"alias\":\"patos\"} -H "Content-Type: application/json" http://localhost:8082/api/users/create/ -v
+
+GET
+>curl http://localhost:8082/api/users/  
+
+PUT 
+>curl -d {\"status\":\"Inactivo\"} -H "Content-Type: application/json" -X PUT http://localhost:8082/api/users/fatos/status/ -v
+
+PUT
+>curl -d {\"recipient\":\"876aaf41-54c5-40cf-a1da-934d728cf3ff\",\"content\":\"ya quisiera 2"} -H "Content-Type: application/json" -X PUT http://localhost:8082/api/users/fato/chat/
+
+Pero acabamos de inactivar el usuario, probemos:
+
+>curl -d {\"recipient\":\"876aaf41-54c5-40cf-a1da-934d728cf3ff\",\"content\":\"ya quisiera 2"} -H "Content-Type: application/json" -X PUT http://localhost:8082/api/users/patos/chat/
+
+# Para probar el uso de la Api: cURL
 
 1- Copie el siguiente Json:
 >{
