@@ -3,7 +3,6 @@ package net.apimessages.pd2.rest;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +26,10 @@ public class UserRest {
 	@Autowired
 	private UserService userService;
 	
+	public UserRest(UserService service) {
+		this.userService = service;
+	}
+	
 	@GetMapping
 	public ResponseEntity<List<User>> getAll(){
 		List<User> users =  userService.findAll();
@@ -43,15 +46,16 @@ public class UserRest {
 			if (n instanceof NullPointerException ) {
 				throw new BadRequest("El alias o email que quiere usar ya se encuentra en uso. ");
 			}else {
-			    throw new ServerError("Mal pedido por parte del usuario.");}
+			    throw new ServerError("Falló el sistema. Lo sentimos.");}
 		}
 	}
 	
 	@PutMapping(path = "/{alias}/chat/", consumes = MediaType.APPLICATION_JSON_VALUE)
 		 public ResponseEntity<User> sendMessage(@PathVariable ("alias") String alias, @RequestBody CopyMessage copyMessage) throws Exception{
 		 User userTemporal = userService.findByAlias(alias);  
+		 String  USER_STATUS_INACTIVE = "Inactivo";
 		 Message messageToSend = new Message(userTemporal.getUUID().toString(),copyMessage.getRecipient(),copyMessage.getContent());
-		 if ((userTemporal == null) || (userTemporal.getStatus() == "Inactivo")){
+		 if ((userTemporal == null) || (userTemporal.getStatus().equalsIgnoreCase(USER_STATUS_INACTIVE))){
 		 	throw new BadRequest("Verifique el alias y/o su estado antes de enviar un mensaje por favor.");
 		 }else{
 		  		
@@ -76,7 +80,7 @@ public class UserRest {
 	 public ResponseEntity<Object> changeStatus(@PathVariable ("alias") String alias, @RequestBody String copy) throws Exception{
 		try{
 			User userTemporal = userService.findByAlias(alias);
-			userTemporal.setStatus(setStatus(copy));
+			userService.setStatus(userTemporal,copy);
 			userService.save(userTemporal);
 		}catch(Exception e){
 			if (e instanceof NullPointerException ) {
@@ -86,16 +90,6 @@ public class UserRest {
 		}
 		return ResponseEntity.status(HttpStatus.ACCEPTED).body(
 		           Collections.singletonMap("Status ", "Cambiado"));
-	}
-	
-	private String setStatus(String copy) {
-		if (copy.contains("Activo")) {
-			return "Activo";
-		}else if(copy.contains("Inactivo")){
-			return "Inactivo";
-		}else {
-			throw new BadRequest("El estado es inválido.");
-		}
 	}
 	
 	public static class CopyMessage{
