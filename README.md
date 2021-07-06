@@ -29,11 +29,27 @@ PUT
 >curl -d {\"status\":\"Inactivo\"} -H "Content-Type: application/json" -X PUT http://localhost:8082/api/users/fatos/status/ -v
 
 PUT
->curl -d {\"recipient\":\"876aaf41-54c5-40cf-a1da-934d728cf3ff\",\"content\":\"ya quisiera 2"} -H "Content-Type: application/json" -X PUT http://localhost:8082/api/users/fato/chat/
+>curl -d {\"recipient\":\"876aaf41-54c5-40cf-a1da-934d728cf3ff\",\"content\":\"ya\"} -H "Content-Type: application/json" -X PUT http://localhost:8082/api/users/patos/chat/
+
+GET
+>curl http://localhost:8082/api/admin/users/patos/consulting/messages/sent/
+
+GET
+>curl http://localhost:8082/api/admin/users/patos/consulting/messages/received/
+
+GET
+>curl http://localhost:8082/api/admin/user/patos/lenguages/
+
+GET
+Para el funcionamiento de este debe colocar en recipient el UUID del usuario con alias "fatos"
+en donde dice 'colocar Aquí'
+>curl -d {\"recipient\":\"colocar Aquí\",\"content\":\"ya\"} -H "Content-Type: application/json" -X PUT http://localhost:8082/api/users/patos/chat/
+Luego
+>curl http://localhost:8082/api/admin/users/patos/consulting/messages/sent/fatos/
 
 Pero acabamos de inactivar el usuario, probemos:
 
->curl -d {\"recipient\":\"876aaf41-54c5-40cf-a1da-934d728cf3ff\",\"content\":\"ya quisiera 2"} -H "Content-Type: application/json" -X PUT http://localhost:8082/api/users/patos/chat/
+>curl -d {\"recipient\":\"876aaf41-54c5-40cf-a1da-934d728cf3ff\",\"content\":\"ya\"} -H "Content-Type: application/json" -X PUT http://localhost:8082/api/users/patos/chat/
 
 # Para probar el uso de la Api: cURL
 

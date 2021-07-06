@@ -37,6 +37,22 @@ public class RandomLanguage {
 		}
 		return resume;
 	}
+	
+	public static Map<String,Integer> getMapOfPromUsers(Integer size){
+		List<String> generated = getLenguages(size);
+		List<String> generated2 = new ArrayList<String>();
+		Map<String, Integer> resume = new HashMap <String, Integer>();
+		Integer count = 0;
+		for (int i=0; i<size;i++) {
+			if(!generated2.contains(generated.get(i))) {
+				count = getCount(generated.get(i),generated);
+				resume.put(generated.get(i),(count*100/size));
+				generated2.add(generated.get(i));
+			}
+			count = 0;
+		}
+		return resume;
+	}
 
 	private static Integer getCount(String string, List<String> lenguages) {		
 		Integer number = 0;

@@ -100,8 +100,8 @@ public class UserMockitoTest {
 		List<Message> messages = new ArrayList<>();
 		UUID uuid = UUID.randomUUID();
 		User userReturn = new User("juan","gmail@gmail.com","alias");
-		User userReturned = new User(id,uuid,"juan","gmail@gmail.com","alias","activo",messages);
-		when(userService.create(any())).thenReturn(userReturned);
+		User userReturned = new User(id,uuid,"juan","gmail@gmail.com","alias","Inactivo",messages);
+		when(userService.setStatus(userReturn, "Inactivo")).thenReturn(userReturned);
 		
 		mockMvc.perform(put("/api/users/alas/status/").contentType(MediaType.APPLICATION_JSON).content(asJsonToString(Collections.singletonMap("Status ", "Activo"))))
 		.andExpect(status().isNotFound());
@@ -113,16 +113,13 @@ public class UserMockitoTest {
 		List<Message> messages = new ArrayList<>();
 		UUID uuid = UUID.randomUUID();
 		User userReturn = new User("juan","gmail@gmail.com","alias");
-		User userReturned = new User(id,uuid,"juan","gmail@gmail.com","alias","Activo",messages);
-		/*MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.put("/api/users/alias/status/")
-	    		.contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(asJsonToString(Collections.singletonMap("status", "Inactivo")));
+		User userReturned = new User(id,uuid,"juan","gmail@gmail.com","alias","Inactivo",messages);
+		when(userService.setStatus(userReturn, "Inactivo")).thenReturn(userReturned);
 		
-		mockMvc.perform(builder)
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string(asJsonToString(Collections.singletonMap("Status ", "Cambiado"))))
-				.andDo(MockMvcResultHandlers.print());*/
+		mockMvc.perform(put("/api/users/alas/status/").contentType(MediaType.APPLICATION_JSON)
+		.content(asJsonToString(Collections.singletonMap("Status ", "Activo"))))
+		.andExpect(status().isOk())
+		.andExpect(MockMvcResultMatchers.content().string(asJsonToString(Collections.singletonMap("Status ", "Cambiado"))));
 	}
 	
 	@Test
